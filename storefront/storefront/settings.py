@@ -117,11 +117,11 @@ WSGI_APPLICATION = 'storefront.wsgi.application'
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "defaultdb",
-#         "USER": "avnadmin",
-#         "PASSWORD": "AVNS_Xj4bAZN1OjPGSPKU4ok",
-#         "HOST": "pg-55e913d9-8d78-4b5d-b565-7617a884f714-db3897174179-choreo-org.f.aivencloud.com",
-#         "PORT": "26937"
+#         "NAME": "db.name",
+#         "USER": "db.user",
+#         "PASSWORD": "db.pwd",
+#         "HOST": "db.host",
+#         "PORT": "db.port"
 #     }
 # }
 
