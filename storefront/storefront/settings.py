@@ -9,13 +9,13 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
-from datetime import timedelta
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+import environ
 
-
+env = environ.Env()
+environ.Env.read_env()
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -49,6 +49,7 @@ REST_FRAMEWORK = {
     ],
      'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.OrderingFilter',
+        'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
     ),
 }
@@ -74,6 +75,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'corsheaders',
+    'django_filters',
+    'formtools',
+
 ]
 
 MIDDLEWARE = [
@@ -119,15 +123,35 @@ WSGI_APPLICATION = 'storefront.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "db.name",
-#         "USER": "db.user",
-#         "PASSWORD": "db.pwd",
-#         "HOST": "db.host",
-#         "PORT": "db.port"
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'database-1',
+#         'USER': 'postgres',
+#         'PASSWORD': 'Mehdi1997',
+#         'ENDPOINT': 'database-1.c9gaksw26an0.us-east-1.rds.amazonaws.com',
+#         'PORT': '5432',
+#         'OPTIONS': {
+#             # 'assume_role': 'my_application_role',
+#             'options': '-c search_path=django,public'
+#             # 'init_command': "SET sql_mode='STRINCT_TRANS_TABLES'"
+#         }
 #     }
 # }
+
+# print('teszt', os.getenv("DB_PWD"))
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.getenv("DB_NAME"),
+#         'USER': os.getenv("DB_USER"),
+#         'PASSWORD': os.getenv("DB_PWD"),
+#         'HOST': os.getenv("DB_HOST"),
+#         'PORT': os.getenv("DB_PORT", '5432'),
+#     }
+# }
+
+# print('good', DATABASES)
 
 DATABASES = {
     "default": {

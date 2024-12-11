@@ -1,0 +1,66 @@
+/* General Styles */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9; /* Light background for contrast */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    align-items: center; /* Vertically center elements */
+    justify-content: space-between; /* Spread elements evenly */
+  }
+  
+  .filter-item {
+    flex: 1; /* Allow items to stretch equally */
+    min-width: 180px; /* Minimum width for smaller screens */
+    max-width: 300px; /* Maximum width for larger items */
+  }
+  
+  .filter-item label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  
+  .filter-item input,
+  .filter-item select,
+  .filter-item .react-datepicker-wrapper input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .filter-item .react-select-container {
+    font-size: 14px;
+  }
+  
+  .filter-item button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .filter-item button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .filter-bar {
+      flex-direction: column; /* Stack items on smaller screens */
+      align-items: flex-start;
+    }
+  
+    .filter-item {
+      max-width: 100%; /* Make items stretch to full width */
+    }
+  }

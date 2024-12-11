@@ -11,7 +11,7 @@ function Note({ note, onDelete, key, categories }) {
       .map((id) => categories.find((category) => category.value === id)?.label)
       .filter(Boolean); // Filter out undefined values
   };
-  console.log("categories note", categories, note.categories);
+  // console.log("categories note", categories, note.categories);
   return (
     <div className="note-card" key={key}>
       <p className="note-title">Title: {note.title}</p>

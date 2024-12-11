@@ -5,37 +5,40 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
-
+import SurveyList from "./pages/SurveyList";
+import SurveyDetail from "./pages/SurveyDetail";
 
 export function Logout() {
   localStorage.clear();
-  return <Navigate to="/login" />
+  return <Navigate to="/login" />;
 }
 
 function RegisterAndLogout() {
   localStorage.clear();
-  return <Register />
+  return <Register />;
 }
 
 function App() {
   return (
     <BrowserRouter>
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
-       <Route path="/login" element={<Login />} />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        {/* <Route path="/" exact component={SurveyList} /> */}
+        <Route path="/survey/:id" element={<SurveyDetail />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
-      </BrowserRouter>
-  )
+    </BrowserRouter>
+  );
 }
 
 export default App

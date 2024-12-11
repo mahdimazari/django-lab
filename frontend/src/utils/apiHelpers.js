@@ -1,8 +1,22 @@
 import api from "../api";
 
 // Fetch notes with optional search query
-export const fetchNotes = async (searchQuery, token) => {
-  const url = searchQuery ? `/api/notes/?search=${searchQuery}` : "/api/notes/";
+export const fetchNotes = async (searchQuery, filters, token) => {
+  let url = "/api/notes/";
+  const params = new URLSearchParams();
+  console.log("filters", searchQuery, filters);
+  if (searchQuery) params.append("search", searchQuery);
+  // if (filters.title) params.append("title", filters.title);
+  if (filters.categories)
+    filters.categories.forEach((cat) => params.append("categories", cat));
+  if (filters.dateRange?.start)
+    params.append("created_at_after", filters.dateRange.start);
+  if (filters.dateRange?.end)
+    params.append("created_at_before", filters.dateRange.end);
+
+  url += `?${params.toString()}`;
+  console.log("url", url);
+  // const url = searchQuery ? `/api/notes/?search=${searchQuery}` : "/api/notes/";
   try {
     const response = await api.get(url, {
       headers: {
@@ -60,3 +74,5 @@ export const deleteNote = async (id, token) => {
     throw error;
   }
 };
+
+export const createSurvey = (data) => api.post("/api/surveys/create/", data);

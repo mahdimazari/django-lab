@@ -6,10 +6,16 @@ import {
   deleteNote,
 } from "../utils/apiHelpers";
 import "../styles/Home.css";
+import "../styles/filters.css";
 import Note from "../components/Note";
 import SearchBar from "../components/SearchBar";
 import Select from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
+import SurveyForm from "../components/SurveyForm";
+import SurveyList from "./SurveyList";
+// import { SurveyWizard } from "../components/SurveyWizard";
 
 function Home() {
   const [notes, setNotes] = useState([]);
@@ -19,17 +25,17 @@ function Home() {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [filters, setFilters] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   // Fetch notes
   useEffect(() => {
-    fetchNotes(searchQuery, token)
+    fetchNotes(searchQuery, filters, token)
       .then((data) => setNotes(data))
       .catch((error) => alert("Error fetching notes.", error));
     console.log("notes", notes);
-  }, [searchQuery]);
+  }, [searchQuery, filters]);
 
   // Fetch categories
   useEffect(() => {
@@ -60,7 +66,7 @@ function Home() {
     try {
       await createNote(formData, token);
       alert("Note created!");
-      fetchNotes("", token).then((data) => setNotes(data)); // Refresh notes
+      fetchNotes("", null, token).then((data) => setNotes(data)); // Refresh notes
     } catch (error) {
       alert("Error creating note.", error);
     }
@@ -71,7 +77,7 @@ function Home() {
       const success = await deleteNote(id, token);
       if (success) {
         alert("Note deleted!");
-        fetchNotes("", token).then((data) => setNotes(data)); // Refresh notes
+        fetchNotes("", null, token).then((data) => setNotes(data)); // Refresh notes
       } else {
         alert("Failed to delete note.");
       }
@@ -79,12 +85,75 @@ function Home() {
       alert("Error deleting note.", error);
     }
   };
-
+  console.log("filters home", filters);
   return (
     <div>
-      <button onClick={() => navigate("/logout")}>Logout</button>
+      {/* <button onClick={() => navigate("/logout")}>Logout</button>
+       */}
+      <button className="logout-button" onClick={() => navigate("/logout")}>
+        <i className="fa fa-sign-out"></i> Logout
+      </button>
+      <h2>Filters</h2>
+      <div className="filter-bar">
+        {/* <!-- Search Bar --> */}
+        <div className="filter-item">
+          <label htmlFor="search">Search:</label>
+          <SearchBar onSearch={(query) => setSearchQuery(query)} />
+        </div>
+
+        {/* <!-- Categories Dropdown -->s */}
+        <div className="filter-item">
+          <label htmlFor="categories">Categories:</label>
+          <Select
+            isMulti
+            options={categories}
+            classNamePrefix="react-select"
+            onChange={(selectedOptions) =>
+              setFilters({
+                ...filters,
+                categories: selectedOptions.map((option) => option.value),
+              })
+            }
+          />
+        </div>
+
+        {/* <!-- Start Date Picker --> */}
+        <div className="filter-item">
+          <label htmlFor="start-date">Start Date:</label>
+          <DatePicker
+            selected={filters.dateRange?.start}
+            onChange={(date) =>
+              setFilters({
+                ...filters,
+                dateRange: {
+                  ...filters.dateRange,
+                  start: date.toISOString().split("T")[0],
+                },
+              })
+            }
+            placeholderText="Start Date"
+          />
+        </div>
+
+        {/* <!-- End Date Picker --> */}
+        <div className="filter-item">
+          <label htmlFor="end-date">End Date:</label>
+          <DatePicker
+            selected={filters.dateRange?.end}
+            onChange={(date) =>
+              setFilters({
+                ...filters,
+                dateRange: {
+                  ...filters.dateRange,
+                  end: date.toISOString().split("T")[0],
+                },
+              })
+            }
+            placeholderText="End Date"
+          />
+        </div>
+      </div>
       <h2>Notes</h2>
-      <SearchBar onSearch={(query) => setSearchQuery(query)} />
       <div className="notes-container">
         {notes.map((note) => (
           <Note
@@ -124,6 +193,16 @@ function Home() {
 
         <input value="submit" type="submit" />
       </form>
+      {/* Integrate SurveyWizard below */}
+      <div>
+        <h2>Survey Form</h2>
+        <SurveyForm />
+      </div>
+
+      <div>
+        <h2>Surveys List</h2>
+        <SurveyList />
+      </div>
     </div>
   );
 }
