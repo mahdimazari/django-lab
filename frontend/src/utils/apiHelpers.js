@@ -4,7 +4,7 @@ import api from "../api";
 export const fetchNotes = async (searchQuery, filters, token) => {
   let url = "/api/notes/";
   const params = new URLSearchParams();
-  console.log("filters", searchQuery, filters);
+  // console.log("filters", searchQuery, filters);
   if (searchQuery) params.append("search", searchQuery);
   // if (filters.title) params.append("title", filters.title);
   if (filters.categories)
@@ -15,7 +15,7 @@ export const fetchNotes = async (searchQuery, filters, token) => {
     params.append("created_at_before", filters.dateRange.end);
 
   url += `?${params.toString()}`;
-  console.log("url", url);
+  // console.log("url", url);
   // const url = searchQuery ? `/api/notes/?search=${searchQuery}` : "/api/notes/";
   try {
     const response = await api.get(url, {
@@ -23,6 +23,7 @@ export const fetchNotes = async (searchQuery, filters, token) => {
         Authorization: `Bearer ${token}`, // Add token for authentication if needed
       },
     });
+    // console.log("response note", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching notes:", error);
@@ -76,3 +77,17 @@ export const deleteNote = async (id, token) => {
 };
 
 export const createSurvey = (data) => api.post("/api/surveys/create/", data);
+
+export const fetchUserPermissions = async () => {
+  try {
+    const response = await api.get("/api/user-permissions/", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`, // Si vous utilisez JWT
+      },
+    });
+    return response.data.permissions; // Retourne la liste des permissions
+  } catch (error) {
+    console.error("Erreur lors de la récupération des permissions :", error);
+    return [];
+  }
+};

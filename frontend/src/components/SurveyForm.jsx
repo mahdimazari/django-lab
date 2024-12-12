@@ -33,7 +33,7 @@ function SurveyForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("test", title, description, questions);
+    // console.log("test", title, description, questions);
     createSurvey({ title, description, questions })
       .then(() => {
         alert("Survey created successfully!");

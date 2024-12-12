@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreateSurveyView, CreateUserView, SubmitSurveyResponseView, SurveyDetailView, SurveyListView, get_users, create_user, NoteListCreate, NoteDelete, get_categories
+from .views import CreateSurveyView, CreateUserView, SubmitSurveyResponseView, SurveyDetailView, SurveyListView, UserPermissionsView, get_users, create_user, NoteListCreate, NoteDelete, get_categories
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from .forms import SurveyStepOneForm, SurveyStepTwoForm,
 
@@ -11,6 +11,7 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="refresh"),
     path("notes/", NoteListCreate.as_view(), name='note-list'),
     path('surveys/', SurveyListView.as_view(), name='survey-list'),
+    path('user-permissions/', UserPermissionsView.as_view(), name='permissions-list'),
     path('surveys/<int:survey_id>/', SurveyDetailView.as_view(), name='survey-detail'),
     path('surveys/<int:survey_id>/responses/', SubmitSurveyResponseView.as_view(), name='submit-response'),
      path('surveys/create/', CreateSurveyView.as_view(), name='create-survey'),

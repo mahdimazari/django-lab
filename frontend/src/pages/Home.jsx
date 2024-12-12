@@ -14,10 +14,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
 import SurveyForm from "../components/SurveyForm";
+import PermissionWrapper from "../utils/PermissionWrapper";
 import SurveyList from "./SurveyList";
+import { PERMISSIONS } from "../utils/constants";
 // import { SurveyWizard } from "../components/SurveyWizard";
 
-function Home() {
+function Home({ userPermissions }) {
   const [notes, setNotes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -34,7 +36,7 @@ function Home() {
     fetchNotes(searchQuery, filters, token)
       .then((data) => setNotes(data))
       .catch((error) => alert("Error fetching notes.", error));
-    console.log("notes", notes);
+    // console.log("notes", notes);
   }, [searchQuery, filters]);
 
   // Fetch categories
@@ -85,7 +87,14 @@ function Home() {
       alert("Error deleting note.", error);
     }
   };
-  console.log("filters home", filters);
+  // const requiredPermissions = Array.isArray(requiredPermission)
+  // ? requiredPermission
+  // : [requiredPermission];
+  // const hasPermission = requiredPermissions.some((perm) =>
+  //   userPermissions.includes(perm)
+  // );
+  // console.log("filters home", filters);
+  console.log("userPermission", userPermissions);
   return (
     <div>
       {/* <button onClick={() => navigate("/logout")}>Logout</button>
@@ -194,15 +203,24 @@ function Home() {
         <input value="submit" type="submit" />
       </form>
       {/* Integrate SurveyWizard below */}
-      <div>
-        <h2>Survey Form</h2>
-        <SurveyForm />
-      </div>
+      {/* <PermissionWrapper
+        userPermissions={userPermissions ?? ["test"]}
+        requiredPermission={PERMISSIONS.VIEW_SURVEYS}
+      > */}
+      {userPermissions.includes(PERMISSIONS.VIEW_SURVEY) && (
+        <>
+          <div>
+            <h2>Survey Form</h2>
+            <SurveyForm />
+          </div>
 
-      <div>
-        <h2>Surveys List</h2>
-        <SurveyList />
-      </div>
+          <div>
+            <h2>Surveys List</h2>
+            <SurveyList />
+          </div>
+        </>
+      )}
+      {/* </PermissionWrapper> */}
     </div>
   );
 }

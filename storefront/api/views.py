@@ -34,6 +34,23 @@ def create_user(request):
         return Response(serializer.data, status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
     
+
+class UserPermissionsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        # user.user_permissions.clear()
+        permissions = [
+            perm for perm in user.get_all_permissions()
+            if user.has_perm(perm)
+        ]
+        groups = user.groups.values_list('name', flat=True)  # Groupes de l'utilisateur
+        return Response({
+            "username": user.username,
+            "permissions": list(permissions),
+            "groups": list(groups),
+        })    
 class NoteListCreate(generics.ListCreateAPIView):
     serializer_class = NoteSerializer
     permission_classes = [IsAuthenticated]
@@ -107,7 +124,7 @@ class SurveyDetailView(APIView):
         try:
             survey = Survey.objects.get(id=survey_id)
         except Survey.DoesNotExist:
-            raise NotFound({"error": "Survey not found"})  # Return 404 if survey does not exist
+            raise NotFound({"error": "Survey not found"})  
 
         serializer = SurveySerializer(survey)
         return Response(serializer.data)
@@ -141,7 +158,7 @@ class CreateSurveyView(APIView):
         """
         data = request.data
         user = request.user
-        print('user', user.id)  # Debugging user id
+        print('user', user.id) 
 
         # Validate survey data
         survey_serializer = SurveySerializer(data={

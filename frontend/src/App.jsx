@@ -1,12 +1,13 @@
-// import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import Home from "./pages/Home"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import NotFound from "./pages/NotFound"
-import ProtectedRoute from "./components/ProtectedRoute"
-import SurveyList from "./pages/SurveyList";
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
+// import SurveyList from "./pages/SurveyList";
 import SurveyDetail from "./pages/SurveyDetail";
+import { fetchUserPermissions } from "./utils/apiHelpers";
 
 export function Logout() {
   localStorage.clear();
@@ -19,6 +20,16 @@ function RegisterAndLogout() {
 }
 
 function App() {
+  const [permissions, setPermissions] = useState([]);
+  const getPermissions = async () => {
+    const userPermissions = await fetchUserPermissions();
+    setPermissions(userPermissions);
+  };
+  useEffect(() => {
+    getPermissions();
+  }, []);
+
+  console.log("return permissions", permissions);
   return (
     <BrowserRouter>
       <Routes>
@@ -26,11 +37,12 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <Home />
+              <Home userPermissions={permissions} />
             </ProtectedRoute>
           }
         />
         {/* <Route path="/" exact component={SurveyList} /> */}
+
         <Route path="/survey/:id" element={<SurveyDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
@@ -41,4 +53,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

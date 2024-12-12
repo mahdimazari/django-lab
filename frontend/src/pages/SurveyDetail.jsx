@@ -11,7 +11,7 @@ const SurveyDetail = () => {
 
   useEffect(() => {
     api.get(`/api/surveys/${id}/`).then((response) => {
-      console.log("survey", response);
+      // console.log("survey", response);
       setSurvey(response.data);
     });
   }, [id]);
