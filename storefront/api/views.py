@@ -133,23 +133,25 @@ class SubmitSurveyResponseView(APIView):
         return Response(response_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class CreateSurveyView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
         """
         Create a new survey with questions and choices.
         """
         data = request.data
-        # user = request.user
+        user = request.user
+        print('user', user.id)  # Debugging user id
 
         # Validate survey data
         survey_serializer = SurveySerializer(data={
             "title": data.get("title"),
             "description": data.get("description"),
-            # "created_by": user.id,
         })
 
         if survey_serializer.is_valid():
-            # Save the survey
-            survey = survey_serializer.save()
+            # Save the survey and associate it with the user
+            survey = self.perform_create(survey_serializer, user)
 
             # Save each question
             for question_data in data.get("questions", []):
@@ -169,5 +171,17 @@ class CreateSurveyView(APIView):
                 status=status.HTTP_201_CREATED,
             )
 
-        return Response(survey_serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+        return Response(survey_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def perform_create(self, serializer, user):
+        """
+        Custom save method to associate the user with the survey.
+        """
+        # Add the user to the survey before saving
+        survey = serializer.save(created_by=user)  # Associate the user
+        return survey
+
+    def get_queryset(self):
+        user = self.request.user
+        return Survey.objects.filter(created_by=user)
 # Create your views here.

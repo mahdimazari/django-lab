@@ -12,6 +12,7 @@ from .models import Note, Category, Survey, Question, Answer, SurveyResponse, Ch
 #     list_editable = ['verified']
 #     list_display = ['user', 'full_name' ,'verified']
 
+@admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
     list_display=['author', "title", "content",  "created_at", "display_categories"]
     list_filter = ('created_at', 'author')
@@ -26,9 +27,9 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display=[ "name", "created_at"]    
 
 
-@admin.register(Note)
-class NoteAdmin(admin.ModelAdmin):
-    list_display = ['title', 'content', 'created_at']
+# @admin.register(Note)
+# class NoteAdmin(admin.ModelAdmin):
+#     list_display = ['title', 'content', 'created_at']
 
 admin.site.register(Category, CategoryAdmin)
 
@@ -41,12 +42,13 @@ class QuestionInline(admin.TabularInline):
 
 @admin.register(Survey)
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'description']  # Display ID in the survey list view
+    list_display = ['id', 'created_by', 'title', 'description']  # Display ID in the survey list view
     inlines = [QuestionInline]
     readonly_fields = ['id']  # Make Survey ID visible and readonly in the detail page
+    list_filter = ('created_by',)
 
 class AnswerInline(admin.TabularInline):
-    """
+    """ 
     Inline display of Answer records in SurveyResponse admin.
     """
     model = Answer

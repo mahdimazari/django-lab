@@ -31,8 +31,8 @@ class SurveySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Survey
-        fields = ['id', 'title', 'description', 'questions']
-        # extra_kwargs = {'created_by': {"read_only": True}}
+        fields = ['id', 'title', 'created_by', 'description', 'questions']
+        extra_kwargs = {'created_by': {"read_only": True}}
 
 class ResponseSerializer(serializers.ModelSerializer):
     class Meta:
