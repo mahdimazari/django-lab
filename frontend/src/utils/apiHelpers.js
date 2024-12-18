@@ -1,4 +1,5 @@
 import api from "../api";
+// import { ACCESS_TOKEN } from "../consstants";
 
 // Fetch notes with optional search query
 export const fetchNotes = async (searchQuery, filters, token) => {
@@ -80,11 +81,7 @@ export const createSurvey = (data) => api.post("/api/surveys/create/", data);
 
 export const fetchUserPermissions = async () => {
   try {
-    const response = await api.get("/api/user-permissions/", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`, // Si vous utilisez JWT
-      },
-    });
+    const response = await api.get("/api/user-permissions/");
     return response.data.permissions; // Retourne la liste des permissions
   } catch (error) {
     console.error("Erreur lors de la récupération des permissions :", error);

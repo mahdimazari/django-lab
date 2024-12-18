@@ -18,3 +18,163 @@ select {
   border-radius: 5px;
   font-size: 1rem;
 }
+
+
+
+
+/* Conteneur principal */
+.responses-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Arial", sans-serif;
+  color: #333;
+}
+
+/* Titre principal */
+.responses-title {
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 25px;
+}
+
+/* Liste des réponses */
+.responses-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Élément d'une réponse */
+.response-item {
+  background-color: #ffffff;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.response-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Texte dans chaque réponse */
+.response-item p {
+  margin: 8px 0;
+  font-size: 16px;
+  color: #555;
+}
+
+/* Lien pour le nom du survey */
+.survey-link {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.survey-link:hover {
+  text-decoration: underline;
+  color: #2980b9;
+}
+
+/* Message lorsqu'il n'y a pas de réponses */
+.no-responses {
+  text-align: center;
+  font-size: 18px;
+  color: #888;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+
+
+
+/* Conteneur principal */
+.surveys-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+  color: #333;
+}
+
+/* Titre principal */
+.surveys-title {
+  font-size: 36px;
+  font-weight: bold;
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+}
+
+/* Grille des surveys */
+.surveys-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Carte de chaque survey */
+.survey-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-align: center;
+}
+
+.survey-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Titre de la carte */
+.survey-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+/* Description */
+.survey-description {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Bouton de réponse */
+.survey-button {
+  display: inline-block;
+  background-color: #3498db;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.survey-button:hover {
+  background-color: #2980b9;
+}
+
+/* Message aucun survey */
+.no-surveys {
+  text-align: center;
+  font-size: 18px;
+  color: #888;
+  font-style: italic;
+  margin-top: 20px;
+}

@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+from datetime import timedelta
 import os
 from dotenv import load_dotenv
 from pathlib import Path
@@ -58,6 +59,14 @@ REST_FRAMEWORK = {
 #     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
 #     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 # }
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # temps d'expiration pour l'access token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # temps d'expiration pour le refresh token
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
 
 MEDIA_URL = '/media/'  # URL d'accès aux fichiers téléchargés
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Répertoire où les fichiers seront stockés

@@ -1,0 +1,65 @@
+/* Container principal */
+.survey-response-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+  }
+  
+  /* Titre principal */
+  .survey-response-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+  
+  /* Titre du survey */
+  .survey-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #555;
+    text-align: center;
+  }
+  
+  /* Conteneur des réponses */
+  .survey-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Une seule réponse */
+  .survey-answer {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+  }
+  
+  .survey-answer:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Texte de la question */
+  .question-text {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+  }
+  
+  /* Texte de la réponse */
+  .answer-text {
+    font-size: 14px;
+    color: #555;
+  }

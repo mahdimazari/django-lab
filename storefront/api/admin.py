@@ -1,11 +1,15 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
+from django.db.models import Q
+
 
 # Register your models here.
-from .models import Note, Category, Survey, Question, Answer, SurveyResponse, Choice
+from .models import Canteen, Note, Category, Survey, Question, Answer, SurveyCanteen, SurveyResponse, Choice
+
+
 
 # class UserAdmin(admin.ModelAdmin):
 #     list_display = ['username', 'email']
+
 
 
 # class ProfileAdmin(admin.ModelAdmin):
@@ -46,6 +50,7 @@ class SurveyAdmin(admin.ModelAdmin):
     inlines = [QuestionInline]
     readonly_fields = ['id']  # Make Survey ID visible and readonly in the detail page
     list_filter = ('created_by',)
+    search_fields = ('title', 'description', 'created_by__username')
 
 class AnswerInline(admin.TabularInline):
     """ 
@@ -63,11 +68,71 @@ class SurveyResponseAdmin(admin.ModelAdmin):
     Admin configuration for SurveyResponse.
     """
     list_display = ('id', 'survey', 'created_at')  # Fields to display in the list view
-    list_filter = ['survey', 'created_at']  # Filters for easy navigation
+    list_filter = ['survey', 'created_at', 'cantine', 'created_by']  # Filters for easy navigation
     # search_fields = ('user__username', 'survey__title')  # Searchable fields
     date_hierarchy = 'created_at'  # Date hierarchy navigation
     inlines = [AnswerInline]  # Display answers inline within the SurveyResponse admin
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Retire le champ 'admins' du formulaire d'ajout.
+        """
+        form = super().get_form(request, obj, **kwargs)
+        if not obj:  # Lors de l'ajout d'une nouvelle cantine
+            form.base_fields.pop('created_by', None)  # Retire le champ 'admins' du formulaire
+        return form
+    def save_model(self, request, obj, form, change):
+        """
+        Ajoute automatiquement l'utilisateur connecté comme utilisateur de la réponse.
+        """
+        if not change:  # Lors de la création d'une nouvelle réponse
+            obj.created_by = request.user  # Associe l'utilisateur connecté
+        super().save_model(request, obj, form, change)
 
+    # Admin for Canteen
+@admin.register(Canteen)
+class CanteenAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'region', 'city', 'postal_code', 'daily_meal_count')
+    search_fields = ('name', 'region', 'city', 'postal_code')
+    # filter_horizontal = ('admins',)  # For many-to-many relationship
+    list_filter = ('region', 'city')  # Add filtering options
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Retire le champ 'admins' du formulaire d'ajout.
+        """
+        form = super().get_form(request, obj, **kwargs)
+        if not obj:  # Lors de l'ajout d'une nouvelle cantine
+            form.base_fields.pop('admins', None)  # Retire le champ 'admins' du formulaire
+        return form
+    def get_queryset(self, request):
+        """
+        Filtre les cantines affichées pour n'afficher que celles associées à l'utilisateur.
+        """
+        qs = super().get_queryset(request)  # Récupère le queryset par défaut
+        user = request.user  # Utilisateur actuellement connecté
+        print('user', user, qs)
+        if user.is_superuser:
+            return qs  # Les superusers voient toutes les cantines
+
+        # Filtrer les cantines où l'utilisateur est admin ou consommateur
+        return qs.filter(Q(admins=user) | Q(consumers=user)).distinct()
+
+    def save_model(self, request, obj, form, change):
+        """
+        Ajoute automatiquement l'utilisateur actuel comme admin lors de la création.
+        """
+        # Sauvegarde l'objet en base de données pour obtenir un ID
+        super().save_model(request, obj, form, change)
+        
+        if not change:  # Si c'est une nouvelle création
+            obj.admins.add(request.user) 
+
+# Admin for SurveyCanteen
+@admin.register(SurveyCanteen)
+class SurveyCanteenAdmin(admin.ModelAdmin):
+    list_display = ('id', 'survey', 'canteen')
+    search_fields = ('survey__title', 'canteen__name')
+    autocomplete_fields = ('survey', 'canteen')  # Use autocomplete for related fields
+    
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
     """

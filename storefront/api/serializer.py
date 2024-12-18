@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Note, User, Category, Survey, Question, Answer, SurveyResponse, Choice
+from .models import Note, User, Category, Survey, Question, Answer, SurveyResponse, Choice, Canteen, SurveyCanteen
 
 
 
@@ -34,15 +34,40 @@ class SurveySerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'created_by', 'description', 'questions']
         extra_kwargs = {'created_by': {"read_only": True}}
 
-class ResponseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SurveyResponse
-        fields = ['id', 'survey', 'created_at']
 
+class CanteenSerializer(serializers.ModelSerializer):
+    admins = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    consumers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    class Meta:
+        model = Canteen
+        fields = ['id', 'name', 'region', 'city', 'postal_code', 'daily_meal_count', 'admins', 'consumers']
+
+class SurveyCanteenSerializer(serializers.ModelSerializer):
+    survey = serializers.PrimaryKeyRelatedField(queryset=Survey.objects.all())
+    canteen = serializers.PrimaryKeyRelatedField(queryset=Canteen.objects.all())
+
+    class Meta:
+        model = SurveyCanteen
+        fields = ['id', 'survey', 'canteen']
 class AnswerSerializer(serializers.ModelSerializer):
+    question_text = serializers.CharField(source='question.text', read_only=True)
+    choice_text = serializers.CharField(source='choice.text', read_only=True)
     class Meta:
         model = Answer
-        fields = ['id', 'response', 'question', 'text', 'choice']
+        fields = ['id', 'response', 'question', 'question_text', 'text', 'choice', 'choice_text']
+class SurveyResponseSerializer(serializers.ModelSerializer):
+    survey = SurveySerializer(read_only=True)
+    created_by = UserSerializer(read_only=True)
+    answers = AnswerSerializer(many=True, read_only=True)
+    survey_title = serializers.CharField(source="survey.title", read_only=True)
+
+    class Meta:
+        model = SurveyResponse
+        fields = ['id', 'survey', 'created_by', 'created_at', 'cantine', 'answers', 'survey_title']
+        # extra_kwargs = {'created_by': {"read_only": True}}
+    
+
+
 
 class NoteSerializer(serializers.ModelSerializer):
 

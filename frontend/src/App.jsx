@@ -1,12 +1,17 @@
+// import { useContext } from "react";
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import SurveyResponseDetail from "./pages/SurveyResponseDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 // import SurveyList from "./pages/SurveyList";
 import SurveyDetail from "./pages/SurveyDetail";
+// import { AuthContext } from "./contexts/AuthContext";
+// import { AuthProvider } from "./contexts/AuthProvider";
+
 import { fetchUserPermissions } from "./utils/apiHelpers";
 
 export function Logout() {
@@ -20,6 +25,7 @@ function RegisterAndLogout() {
 }
 
 function App() {
+  // const { permissions } = useContext(AuthContext);
   const [permissions, setPermissions] = useState([]);
   const getPermissions = async () => {
     const userPermissions = await fetchUserPermissions();
@@ -29,8 +35,9 @@ function App() {
     getPermissions();
   }, []);
 
-  console.log("return permissions", permissions);
+  // console.log("return permissions", permissions);
   return (
+    // <AuthProvider>
     <BrowserRouter>
       <Routes>
         <Route
@@ -38,11 +45,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Home userPermissions={permissions} />
+              {/* <Home /> */}
             </ProtectedRoute>
           }
         />
         {/* <Route path="/" exact component={SurveyList} /> */}
-
+        <Route
+          path="/survey-responses/:id"
+          element={<SurveyResponseDetail />}
+        />
         <Route path="/survey/:id" element={<SurveyDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
@@ -50,6 +61,7 @@ function App() {
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </BrowserRouter>
+    // </AuthProvider>
   );
 }
 

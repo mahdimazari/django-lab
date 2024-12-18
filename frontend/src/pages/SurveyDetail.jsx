@@ -8,11 +8,19 @@ const SurveyDetail = () => {
   const { id } = useParams();
   const [survey, setSurvey] = useState(null);
   const [answers, setAnswers] = useState({});
+  const [canteens, setCanteens] = useState([]);
+  const [selectedCanteen, setSelectedCanteen] = useState("");
 
   useEffect(() => {
     api.get(`/api/surveys/${id}/`).then((response) => {
       // console.log("survey", response);
       setSurvey(response.data);
+    });
+    // api.get("/api/canteens/").then((response) => {
+    //   setCanteens(response.data);
+    // });
+    api.get(`/api/surveys/${id}/canteens/`).then((response) => {
+      setCanteens(response.data); // Mettre à jour l'état avec les cantines
     });
   }, [id]);
 
@@ -21,6 +29,7 @@ const SurveyDetail = () => {
     api
       .post(`/api/surveys/${survey.id}/responses/`, {
         answers: Object.values(answers),
+        canteen_id: selectedCanteen,
       })
       .then(() => {
         alert("Survey submitted successfully!");
@@ -83,6 +92,23 @@ const SurveyDetail = () => {
               ))}
           </div>
         ))}
+
+        {/* Sélection de la cantine */}
+        <div>
+          <label htmlFor="canteen">Select Canteen:</label>
+          <select
+            id="canteen"
+            value={selectedCanteen}
+            onChange={(e) => setSelectedCanteen(e.target.value)}
+          >
+            <option value="">Select a canteen</option>
+            {canteens.map((canteen) => (
+              <option key={canteen.id} value={canteen.id}>
+                {canteen.name}
+              </option>
+            ))}
+          </select>
+        </div>
         <button type="submit">Submit</button>
       </form>
     </div>
