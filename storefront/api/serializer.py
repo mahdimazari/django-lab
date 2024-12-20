@@ -15,17 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
-# class ChoiceSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Choice
-#         fields = ['id', 'text']
 
-# class QuestionSerializer(serializers.ModelSerializer):
-#     choices = ChoiceSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Question
-#         fields = ['id', 'text', 'question_type', 'required', 'choices']
 
 class SurveySerializer(serializers.ModelSerializer):
     # questions = QuestionSerializer(many=True, read_only=True)
@@ -44,30 +34,7 @@ class CanteenSerializer(serializers.ModelSerializer):
         model = Canteen
         fields = ['id', 'name', 'region', 'city', 'postal_code', 'daily_meal_count', 'admins', 'consumers', 'relatedSurveys']
 
-# class SurveyCanteenSerializer(serializers.ModelSerializer):
-#     survey = serializers.PrimaryKeyRelatedField(queryset=Survey.objects.all())
-#     canteen = serializers.PrimaryKeyRelatedField(queryset=Canteen.objects.all())
 
-#     class Meta:
-#         model = SurveyCanteen
-#         fields = ['id', 'survey', 'canteen']
-# class AnswerSerializer(serializers.ModelSerializer):
-#     question_text = serializers.CharField(source='question.text', read_only=True)
-#     choice_text = serializers.CharField(source='choice.text', read_only=True)
-#     class Meta:
-#         model = Answer
-#         fields = ['id', 'response', 'question', 'question_text', 'text', 'choice', 'choice_text']
-# class SurveyResponseSerializer(serializers.ModelSerializer):
-#     survey = serializers.PrimaryKeyRelatedField(queryset=Survey.objects.all()) 
-#     created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-#     answers = AnswerSerializer(many=True, read_only=True)
-#     survey_title = serializers.CharField(source="survey.title", read_only=True)
-
-#     class Meta:
-#         model = SurveyResponse
-#         fields = ['id', 'survey', 'created_by', 'created_at', 'cantine', 'answers', 'survey_title']
-        # extra_kwargs = {'created_by': {"read_only": True}}
-    
 
 
 
