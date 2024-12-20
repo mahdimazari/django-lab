@@ -42,13 +42,13 @@ class QuestionInline(admin.TabularInline):
     model = Question
     extra = 1  # Allows adding extra empty rows for new questions
     fields = ['id', 'survey', 'text', 'question_type', 'required']  # Include survey and question IDs
-    readonly_fields = ['id', 'survey']  # Make Survey ID visible and readonly in the detail page
+    readonly_fields = ['id', 'survey']  
 
 @admin.register(Survey)
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'created_by', 'title', 'description']  # Display ID in the survey list view
+    list_display = ['id', 'created_by', 'title', 'description'] 
     inlines = [QuestionInline]
-    readonly_fields = ['id']  # Make Survey ID visible and readonly in the detail page
+    readonly_fields = ['id']  
     list_filter = ('created_by',)
     search_fields = ('title', 'description', 'created_by__username')
 

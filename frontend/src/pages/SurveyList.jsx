@@ -6,15 +6,19 @@ import { ACCESS_TOKEN } from "../constants";
 const SurveyList = () => {
   const [surveys, setSurveys] = useState([]);
   const [responses, setResponses] = useState([]);
+  const [canteens, setCanteens] = useState([]);
+  const [selectedCanteen, setSelectedCanteen] = useState(null);
 
   useEffect(() => {
     // api.get("/api/surveys/").then((response) => {
     //   setSurveys(response.data);
     // });
-    api.get("/api/surveys/accessible/").then((response) => {
-      setSurveys(response.data);
+    // api.get("/api/surveys/accessible/").then((response) => {
+    //   setSurveys(response.data);
+    // });
+    api.get("/api/canteens/accessible/").then((response) => {
+      setCanteens(response.data);
     });
-
     api
       .get("/api/survey-responses/", {
         headers: {
@@ -26,6 +30,17 @@ const SurveyList = () => {
         setResponses(response.data);
       });
   }, []);
+
+  const fetchSurveysForCanteen = async (canteenId) => {
+    await api.get(`/api/surveys-canteen/${canteenId}`).then((response) => {
+      setSurveys(response.data);
+    });
+  };
+
+  const handleCanteenClick = (canteenId) => {
+    setSelectedCanteen(canteenId); // Mettre à jour la cantine sélectionnée
+    fetchSurveysForCanteen(canteenId); // Charger les surveys de cette cantine
+  };
 
   return (
     // <div>
@@ -49,23 +64,47 @@ const SurveyList = () => {
     // </div>
     <>
       <div className="surveys-container">
-        <h1 className="surveys-title">Surveys Disponibles</h1>
-        {surveys.length > 0 ? (
+        <h1 className="surveys-title">Cantines Disponibles</h1>
+        {canteens.length > 0 ? (
           <div className="surveys-grid">
-            {surveys.map((survey) => (
-              <div className="survey-card" key={survey.id}>
-                <h3 className="survey-title">{survey.title}</h3>
-                <p className="survey-description">{survey.description}</p>
-                <a href={`survey/${survey.id}`} className="survey-button">
-                  Répondre au Survey
-                </a>
+            {canteens.map((canteen) => (
+              <div
+                className="survey-card"
+                key={canteen.id}
+                onClick={() => handleCanteenClick(canteen.id)}
+              >
+                <h3 className="survey-title">{canteen.name}</h3>
+                <p>
+                  {canteen.city}, {canteen.region}
+                </p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="no-surveys">Aucun survey disponible pour vous.</p>
+          <p className="no-surveys">Aucune cantine disponible pour vous.</p>
         )}
       </div>
+      {selectedCanteen && (
+        <div className="surveys-container">
+          <h1 className="surveys-title">Surveys Disponibles</h1>
+          {surveys.length > 0 ? (
+            <div className="surveys-grid">
+              {surveys.map((survey) => (
+                <div className="survey-card" key={survey.id}>
+                  <h3 className="survey-title">{survey.title}</h3>
+                  <p className="survey-description">{survey.description}</p>
+
+                  <a href={`survey/${survey.id}`} className="survey-button">
+                    Répondre au Survey
+                  </a>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="no-surveys">Aucun survey disponible pour vous.</p>
+          )}
+        </div>
+      )}
       <div className="responses-container">
         <h1 className="responses-title">Mes Réponses</h1>
         {responses.length > 0 ? (
@@ -78,7 +117,7 @@ const SurveyList = () => {
                     href={`survey-responses/${response.id}`}
                     className="survey-link"
                   >
-                    {response.survey.title}
+                    {response.survey_title}
                   </a>
                 </p>
                 <p>
@@ -92,7 +131,7 @@ const SurveyList = () => {
                   })}
                 </p>
                 <p>
-                  <strong>Créé par:</strong> {response.created_by.username}
+                  <strong>Créé par:</strong> {response.created_by}
                 </p>
               </li>
             ))}

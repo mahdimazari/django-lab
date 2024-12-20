@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 from django.utils import timezone
 
+from djf_surveys.models import Survey
+
 
 # class User(AbstractUser):
 #     username = models.CharField(max_length=100)

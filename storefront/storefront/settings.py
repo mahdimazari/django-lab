@@ -86,6 +86,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'formtools',
+    'djf_surveys',
+    'tinymce'
 
 ]
 
@@ -120,6 +122,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'djf_surveys.context_processors.surveys_context'
             ],
         },
     },

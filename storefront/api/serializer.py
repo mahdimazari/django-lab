@@ -56,8 +56,8 @@ class AnswerSerializer(serializers.ModelSerializer):
         model = Answer
         fields = ['id', 'response', 'question', 'question_text', 'text', 'choice', 'choice_text']
 class SurveyResponseSerializer(serializers.ModelSerializer):
-    survey = SurveySerializer(read_only=True)
-    created_by = UserSerializer(read_only=True)
+    survey = serializers.PrimaryKeyRelatedField(queryset=Survey.objects.all()) 
+    created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     answers = AnswerSerializer(many=True, read_only=True)
     survey_title = serializers.CharField(source="survey.title", read_only=True)
 

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CanteenDetailView, CanteenListView, CreateCanteenView, CreateSurveyCanteenView, CreateSurveyView, CreateUserView, SubmitSurveyResponseView, SurveyCanteenListView, SurveyCanteensView, SurveyDetailView, SurveyListView, SurveysUserView, UserPermissionsView, SurveyResponseDetailView, UserSurveyResponsesView, get_users, create_user, NoteListCreate, NoteDelete, get_categories
+from .views import CanteenDetailView, CanteenListView, CanteensUserView, CreateCanteenView, CreateSurveyCanteenView, CreateSurveyView, CreateUserView, SubmitSurveyResponseView, SurveyCanteenListView, SurveyCanteensView, SurveyDetailView, SurveyListByCanteen, SurveyListView, SurveysUserView, UserPermissionsView, SurveyResponseDetailView, UserSurveyResponsesView, get_users, create_user, NoteListCreate, NoteDelete, get_categories
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 # from .forms import SurveyStepOneForm, SurveyStepTwoForm,
 
@@ -11,6 +11,7 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="refresh"),
     path("notes/", NoteListCreate.as_view(), name='note-list'),
     path('surveys/', SurveyListView.as_view(), name='survey-list'),
+    path('surveys-canteen/<int:canteen_id>', SurveyListByCanteen.as_view(), name='survey-list-by-canteen'),
     path('user-permissions/', UserPermissionsView.as_view(), name='permissions-list'),
     path('surveys/<int:survey_id>/', SurveyDetailView.as_view(), name='survey-detail'),
     path('surveys/<int:survey_id>/responses/', SubmitSurveyResponseView.as_view(), name='submit-response'),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('canteens/create/', CreateCanteenView.as_view(), name='canteen-create'),
     path('canteens/<int:canteen_id>/', CanteenDetailView.as_view(), name='canteen-detail'),
     path('surveys/accessible/', SurveysUserView.as_view(), name='accessible-surveys'),
+    path('canteens/accessible/', CanteensUserView.as_view(), name='accessible-canteens'),
     # SurveyCanteen endpoints
     path('survey-canteens/', SurveyCanteenListView.as_view(), name='survey-canteen-list'),
     path('survey-canteens/create/', CreateSurveyCanteenView.as_view(), name='survey-canteen-create'),

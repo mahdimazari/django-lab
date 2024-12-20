@@ -119,6 +119,32 @@ class SurveyListView(ListAPIView):
 
 
 
+class SurveyListByCanteen(APIView):
+    """
+    Récupérer les surveys pour une cantine donnée.
+    """
+    def get(self, request, canteen_id):
+        # canteen_id = request.query_params.get('canteen_id')
+        # print('params', request.query_params.get('canteen_id'), canteen_id)
+        if not canteen_id:
+            return Response({"error": "Canteen ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Récupérer les surveys associés à cette cantine via la table de jonction
+        surveys = SurveyCanteen.objects.filter(canteen_id=canteen_id)
+        surveys_list = [survey.survey for survey in surveys]
+
+        # Sérialiser et retourner les surveys
+        serializer = SurveySerializer(surveys_list, many=True)
+        return Response(serializer.data)
+        # print('survey cant', surveys.get_queryset('cantine'))
+        # if not surveys:
+        #     return Response({"error": "No surveys found for this cantine."}, status=status.HTTP_404_NOT_FOUND)
+
+        # # Sérialiser les surveys et les retourner
+        # serializer = SurveySerializer(surveys, many=True)
+        # return Response(serializer.data)
+
+
 class SurveysUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -129,11 +155,28 @@ class SurveysUserView(APIView):
         cantines = Canteen.objects.filter(Q(admins=user) | Q(consumers=user))
 
         # Filtrer les surveys liés à ces cantines via SurveyCanteen
-        survey_ids = SurveyCanteen.objects.filter(canteen__in=cantines).values_list('survey_id', flat=True)
+        survey_ids = Survey.objects.filter(canteen__in=cantines).values_list('survey_id', flat=True)
         surveys = Survey.objects.filter(id__in=survey_ids)
 
         # Sérialiser les surveys
         serializer = SurveySerializer(surveys, many=True)
+        return Response(serializer.data)
+    
+class CanteensUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # Filtrer les cantines où l'utilisateur est admin ou consommateur
+        cantines = Canteen.objects.filter(consumers=user)
+
+        # Filtrer les surveys liés à ces cantines via SurveyCanteen
+        # survey_ids = SurveyCanteen.objects.filter(canteen__in=cantines).values_list('survey_id', flat=True)
+        # surveys = Survey.objects.filter(id__in=survey_ids)
+
+        # Sérialiser les surveys
+        serializer = CanteenSerializer(cantines, many=True)
         return Response(serializer.data)
 
 class SurveyDetailView(APIView):
@@ -179,7 +222,7 @@ class SubmitSurveyResponseView(APIView):
         # Vérifier si la cantine est fournie
         canteen_id = data.get("canteen_id")
         user = request.user
-        print('canteen', canteen_id, user)
+        print('canteen', canteen_id, user, survey_id)
         if not canteen_id:
             return Response({"error": "Canteen ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -189,9 +232,13 @@ class SubmitSurveyResponseView(APIView):
             print('ok')
         except Canteen.DoesNotExist:
             return Response({"error": "Canteen not found."}, status=status.HTTP_404_NOT_FOUND)
-
+        try:
+            survey = Survey.objects.get(id=survey_id)
+        except Survey.DoesNotExist:
+            return Response({"error": "Survey not found."}, status=status.HTTP_404_NOT_FOUND)
         # Valider la réponse
         response_serializer = SurveyResponseSerializer(data={'survey': survey_id, 'cantine': canteen_id, 'created_by': user.id})
+        print('data', response_serializer.is_valid(), response_serializer)
         if response_serializer.is_valid():
             # Sauvegarder la réponse
             response = response_serializer.save()
@@ -203,6 +250,7 @@ class SubmitSurveyResponseView(APIView):
 
             # Enregistrer les réponses aux questions
             for answer_data in data.get('answers', []):
+                print('quest')
                 answer_serializer = AnswerSerializer(data={
                     'response': response.id,
                     'question': answer_data['question'],
