@@ -13,7 +13,7 @@ import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
-import SurveyForm from "../components/SurveyForm";
+// import SurveyForm from "../components/SurveyForm";
 // import PermissionWrapper from "../utils/PermissionWrapper";
 import SurveyList from "./SurveyList";
 import { PERMISSIONS } from "../utils/constants";
@@ -103,17 +103,17 @@ function Home({ userPermissions }) {
       <button className="logout-button" onClick={() => navigate("/logout")}>
         <i className="fa fa-sign-out"></i> Logout
       </button>
-      {userPermissions.includes(PERMISSIONS.VIEW_NOTE) && (
+      {/* {userPermissions.includes(PERMISSIONS.VIEW_NOTE) && (
         <div>
           <h2>Filters</h2>
           <div className="filter-bar">
-            {/* <!-- Search Bar --> */}
+           
             <div className="filter-item">
               <label htmlFor="search">Search:</label>
               <SearchBar onSearch={(query) => setSearchQuery(query)} />
             </div>
 
-            {/* <!-- Categories Dropdown -->s */}
+           
             <div className="filter-item">
               <label htmlFor="categories">Categories:</label>
               <Select
@@ -129,7 +129,7 @@ function Home({ userPermissions }) {
               />
             </div>
 
-            {/* <!-- Start Date Picker --> */}
+           
             <div className="filter-item">
               <label htmlFor="start-date">Start Date:</label>
               <DatePicker
@@ -147,7 +147,7 @@ function Home({ userPermissions }) {
               />
             </div>
 
-            {/* <!-- End Date Picker --> */}
+          
             <div className="filter-item">
               <label htmlFor="end-date">End Date:</label>
               <DatePicker
@@ -206,14 +206,14 @@ function Home({ userPermissions }) {
             <input value="submit" type="submit" />
           </form>
         </div>
-      )}
+      )} */}
 
       {userPermissions.includes(PERMISSIONS.VIEW_SURVEY) && (
         <>
-          <div>
+          {/* <div>
             <h2>Survey Form</h2>
             <SurveyForm />
-          </div>
+          </div> */}
 
           <div>
             <h2>Surveys List</h2>

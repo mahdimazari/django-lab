@@ -58,15 +58,15 @@ class Category(models.Model):
         return self.name
     
 
-class Survey(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True, null=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+# class Survey(models.Model):
+#     title = models.CharField(max_length=200)
+#     description = models.TextField(blank=True, null=True)
+#     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.title
-    
+#     def __str__(self):
+#         return self.title
+     
 
 class Region(models.TextChoices):
     guadeloupe = "01", "01 - Guadeloupe"
@@ -96,53 +96,56 @@ class Canteen(models.Model):
     daily_meal_count = models.PositiveIntegerField(null=True, blank=True, verbose_name="repas par jour")
     admins = models.ManyToManyField(User, related_name="canteens")  # Les utilisateurs qui administrent la cantine
     consumers = models.ManyToManyField(User, related_name="consumer_canteens", verbose_name="Consommateurs")
+    relatedSurveys = models.ManyToManyField(Survey, related_name="surveys", blank=True,)
 
     def __str__(self):
         return self.name
 
 
 
-class Question(models.Model):
-    QUESTION_TYPES = [
-        ('text', 'Text'),
-        ('textarea', 'Textarea'),
-        ('radio', 'Radio'),
-        ('checkbox', 'Checkbox'),
-    ]
-    survey = models.ForeignKey(Survey, related_name="questions", on_delete=models.CASCADE)
-    text = models.CharField(max_length=255)
-    question_type = models.CharField(choices=QUESTION_TYPES, max_length=50)
-    required = models.BooleanField(default=True)
+# class Question(models.Model):
+#     QUESTION_TYPES = [clear
+#         ('text', 'Text'),
+#         ('textarea', 'Textarea'),
+#         ('radio', 'Radio'),
+#         ('checkbox', 'Checkbox'),
+#     ]
+#     survey = models.ForeignKey(Survey, related_name="questions", on_delete=models.CASCADE)
+#     text = models.CharField(max_length=255)
+#     question_type = models.CharField(choices=QUESTION_TYPES, max_length=50)
+#     required = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.text
+#     def __str__(self):
+#         return self.text
 
-class Choice(models.Model):
-    question = models.ForeignKey(Question, related_name="choices", on_delete=models.CASCADE)
-    text = models.CharField(max_length=255)
+# class Choice(models.Model):
+#     question = models.ForeignKey(Question, related_name="choices", on_delete=models.CASCADE)
+#     text = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.text
+#     def __str__(self):
+#         return self.text
 
-class SurveyResponse(models.Model):
-    survey = models.ForeignKey(Survey, related_name="responses", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    cantine = models.ForeignKey(Canteen, related_name="survey_responses", on_delete=models.CASCADE, null=True, blank=True)
+# class SurveyResponse(models.Model):
+#     survey = models.ForeignKey(Survey, related_name="responses", on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+#     cantine = models.ForeignKey(Canteen, related_name="survey_responses", on_delete=models.CASCADE, null=True, blank=True)
 
-class Answer(models.Model):
-    response = models.ForeignKey(SurveyResponse, related_name="answers", on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    text = models.TextField(blank=True, null=True)
-    choice = models.ForeignKey(Choice, blank=True, null=True, on_delete=models.CASCADE)
-    # created_at = models.DateTimeField(auto_now_add=True)
-
-
+# class Answer(models.Model):
+#     response = models.ForeignKey(SurveyResponse, related_name="answers", on_delete=models.CASCADE)
+#     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+#     text = models.TextField(blank=True, null=True)
+#     choice = models.ForeignKey(Choice, blank=True, null=True, on_delete=models.CASCADE)
+#     # created_at = models.DateTimeField(auto_now_add=True)
 
 
-class SurveyCanteen(models.Model):
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name="survey_canteens")
-    canteen = models.ForeignKey(Canteen, on_delete=models.CASCADE, related_name="survey_canteens")
 
-    def __str__(self):
-        return f"{self.survey.title} - {self.canteen.name}"
+
+# class SurveyCanteen(models.Model):
+#     print('survey', Survey.objects.all())
+#     print('canteen', Canteen.objects.all())
+#     survey = models.ForeignKey(Survey, on_delete=models.CASCADE, related_name="survey_canteens")
+#     canteen = models.ForeignKey(Canteen, on_delete=models.CASCADE, related_name="survey_canteens")
+
+    # def __str__(self):
+    #     return f"{self.survey.name}- {self.canteen.name}"

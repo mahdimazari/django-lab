@@ -89,16 +89,25 @@ const SurveyList = () => {
           <h1 className="surveys-title">Surveys Disponibles</h1>
           {surveys.length > 0 ? (
             <div className="surveys-grid">
-              {surveys.map((survey) => (
-                <div className="survey-card" key={survey.id}>
-                  <h3 className="survey-title">{survey.title}</h3>
-                  <p className="survey-description">{survey.description}</p>
+              {surveys.map(
+                (survey) => (
+                  console.log("survey slug", survey),
+                  (
+                    <div className="survey-card" key={survey.id}>
+                      <h3 className="survey-title">{survey.name}</h3>
+                      <p className="survey-description">{survey.slug}</p>
 
-                  <a href={`survey/${survey.id}`} className="survey-button">
-                    Répondre au Survey
-                  </a>
-                </div>
-              ))}
+                      {/* <a href={`survey/${survey.id}`} className="survey-button"> */}
+                      <a
+                        href={`http://127.0.0.1:8000/surveys/create/${survey.slug}/`}
+                        className="survey-button"
+                      >
+                        Répondre au Survey {survey.slug}
+                      </a>
+                    </div>
+                  )
+                )
+              )}
             </div>
           ) : (
             <p className="no-surveys">Aucun survey disponible pour vous.</p>
@@ -117,7 +126,7 @@ const SurveyList = () => {
                     href={`survey-responses/${response.id}`}
                     className="survey-link"
                   >
-                    {response.survey_title}
+                    {response.survey_name}
                   </a>
                 </p>
                 <p>

@@ -62,7 +62,7 @@ const SurveyDetail = () => {
 
   return (
     <div>
-      <h1>{survey.title}</h1>
+      <h1>{survey.name}</h1>
       <p>{survey.description}</p>
       <form onSubmit={handleSubmit}>
         {survey.questions.map((question) => (

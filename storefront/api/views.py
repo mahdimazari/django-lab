@@ -9,11 +9,13 @@ from rest_framework.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 from .filter import NoteFilter
 from django.shortcuts import get_object_or_404, redirect
-from .models import Note, Survey, Category, User, SurveyResponse, Choice, Question, Canteen, SurveyCanteen
+from .models import Note,Category, User,  Canteen
+from djf_surveys.models import Survey
+# from djf_surveys.serializers import SurveySerializer
 from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound
-from .serializer import NoteSerializer, UserSerializer, CategorySerializer, SurveySerializer, AnswerSerializer, SurveyResponseSerializer,CanteenSerializer, SurveyCanteenSerializer
+from .serializer import CanteenSerializer, NoteSerializer, UserSerializer, CategorySerializer,CanteenSerializer, SurveySerializer
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -59,7 +61,7 @@ class NoteListCreate(generics.ListCreateAPIView):
     filterset_class = NoteFilter
 
     def validate(self, data):
-        print("test")
+        
         if not data.get('title'):
             raise ValidationError("Title is required.")
         return data
@@ -72,7 +74,7 @@ class NoteListCreate(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         # Ensure the categories are being passed correctly
         categories = self.request.data.getlist('categories')
-        print('test', self.request.data, categories)
+      
         note = serializer.save(author=self.request.user)
         if categories:
             note.categories.set(categories)
@@ -121,28 +123,51 @@ class SurveyListView(ListAPIView):
 
 class SurveyListByCanteen(APIView):
     """
-    Récupérer les surveys pour une cantine donnée.
+    Récupérer les surveys associés à une cantine donnée.
     """
     def get(self, request, canteen_id):
-        # canteen_id = request.query_params.get('canteen_id')
-        # print('params', request.query_params.get('canteen_id'), canteen_id)
-        if not canteen_id:
-            return Response({"error": "Canteen ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            # Récupérer la cantine par son ID
+            canteen = Canteen.objects.get(id=canteen_id)
+            
+            # Récupérer les surveys associés à cette cantine via la relation ManyToMany
+            surveys = canteen.relatedSurveys.all()
+            
+            # Sérialiser les surveys
+            serializer = SurveySerializer(surveys, many=True)
+            
+            # Retourner la réponse
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except Canteen.DoesNotExist:
+            return Response({"error": "Canteen not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Récupérer les surveys associés à cette cantine via la table de jonction
-        surveys = SurveyCanteen.objects.filter(canteen_id=canteen_id)
-        surveys_list = [survey.survey for survey in surveys]
 
-        # Sérialiser et retourner les surveys
-        serializer = SurveySerializer(surveys_list, many=True)
-        return Response(serializer.data)
-        # print('survey cant', surveys.get_queryset('cantine'))
-        # if not surveys:
-        #     return Response({"error": "No surveys found for this cantine."}, status=status.HTTP_404_NOT_FOUND)
+# class SurveyListByCanteen(APIView):
+#     """
+#     Récupérer les surveys pour une cantine donnée.
+#     """
+#     def get(self, request, canteen_id):
+#         print('cantine', canteen_id)
+#         # Vérifier que le `canteen_id` est fourni
+#         if not canteen_id:
+#             return Response({"error": "Canteen ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+#         # Récupérer les surveys associés à cette cantine via la table de jonction `SurveyCanteen`
+#         surveys = SurveyCanteen.objects.filter(canteen_id=canteen_id)
+#         print('surveys', surveys)
 
-        # # Sérialiser les surveys et les retourner
-        # serializer = SurveySerializer(surveys, many=True)
-        # return Response(serializer.data)
+#         if not surveys.exists():
+#             return Response({"error": "No surveys found for the given canteen."}, status=status.HTTP_404_NOT_FOUND)
+        
+#         # Créer une liste des surveys associés à la cantine
+#         surveys_list = [survey.survey for survey in surveys]
+#         print('survey',surveys_list)
+
+#         # Sérialiser les surveys en utilisant le SurveySerializer du package djf_surveys
+#         serializer = SurveySerializer(surveys_list, many=True)
+#         print('serializer', serializer)
+#         return Response(serializer.data)
 
 
 class SurveysUserView(APIView):
@@ -211,145 +236,145 @@ class SurveyDetailView(APIView):
 #             return Response({'message': 'Survey response submitted successfully!'})
 #         return Response(response_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class SubmitSurveyResponseView(APIView):
-    """
-    Vue pour soumettre une réponse à un survey, associée à une cantine donnée.
-    """
+# class SubmitSurveyResponseView(APIView):
+#     """
+#     Vue pour soumettre une réponse à un survey, associée à une cantine donnée.
+#     """
 
-    def post(self, request, survey_id):
-        data = request.data
-        print('data', data.get("canteen_id"))
-        # Vérifier si la cantine est fournie
-        canteen_id = data.get("canteen_id")
-        user = request.user
-        print('canteen', canteen_id, user, survey_id)
-        if not canteen_id:
-            return Response({"error": "Canteen ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+#     def post(self, request, survey_id):
+#         data = request.data
+#         print('data', data.get("canteen_id"))
+#         # Vérifier si la cantine est fournie
+#         canteen_id = data.get("canteen_id")
+#         user = request.user
+#         print('canteen', canteen_id, user, survey_id)
+#         if not canteen_id:
+#             return Response({"error": "Canteen ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Vérifier que la cantine existe
-        try:
-            canteen = Canteen.objects.get(id=canteen_id)
-            print('ok')
-        except Canteen.DoesNotExist:
-            return Response({"error": "Canteen not found."}, status=status.HTTP_404_NOT_FOUND)
-        try:
-            survey = Survey.objects.get(id=survey_id)
-        except Survey.DoesNotExist:
-            return Response({"error": "Survey not found."}, status=status.HTTP_404_NOT_FOUND)
-        # Valider la réponse
-        response_serializer = SurveyResponseSerializer(data={'survey': survey_id, 'cantine': canteen_id, 'created_by': user.id})
-        print('data', response_serializer.is_valid(), response_serializer)
-        if response_serializer.is_valid():
-            # Sauvegarder la réponse
-            response = response_serializer.save()
-            print('response', response, response_serializer)
+#         # Vérifier que la cantine existe
+#         try:
+#             canteen = Canteen.objects.get(id=canteen_id)
+#             print('ok')
+#         except Canteen.DoesNotExist:
+#             return Response({"error": "Canteen not found."}, status=status.HTTP_404_NOT_FOUND)
+#         try:
+#             survey = Survey.objects.get(id=survey_id)
+#         except Survey.DoesNotExist:
+#             return Response({"error": "Survey not found."}, status=status.HTTP_404_NOT_FOUND)
+#         # Valider la réponse
+#         response_serializer = SurveyResponseSerializer(data={'survey': survey_id, 'cantine': canteen_id, 'created_by': user.id})
+#         print('data', response_serializer.is_valid(), response_serializer)
+#         if response_serializer.is_valid():
+#             # Sauvegarder la réponse
+#             response = response_serializer.save()
+#             print('response', response, response_serializer)
 
-            # Associer la cantine à la réponse
-            # response.cantine.add(canteen)
-            # response.save()
+#             # Associer la cantine à la réponse
+#             # response.cantine.add(canteen)
+#             # response.save()
 
-            # Enregistrer les réponses aux questions
-            for answer_data in data.get('answers', []):
-                print('quest')
-                answer_serializer = AnswerSerializer(data={
-                    'response': response.id,
-                    'question': answer_data['question'],
-                    'text': answer_data.get('text', ''),
-                    'choice': answer_data.get('choice', None),
-                })
-                if answer_serializer.is_valid():
-                    answer_serializer.save()
-                else:
-                    return Response(answer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#             # Enregistrer les réponses aux questions
+#             for answer_data in data.get('answers', []):
+#                 print('quest')
+#                 answer_serializer = AnswerSerializer(data={
+#                     'response': response.id,
+#                     'question': answer_data['question'],
+#                     'text': answer_data.get('text', ''),
+#                     'choice': answer_data.get('choice', None),
+#                 })
+#                 if answer_serializer.is_valid():
+#                     answer_serializer.save()
+#                 else:
+#                     return Response(answer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({"message": "Survey response submitted successfully!"}, status=status.HTTP_201_CREATED)
-        return Response(response_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-class SurveyResponseDetailView(generics.RetrieveUpdateAPIView):
-    queryset = SurveyResponse.objects.all()
-    serializer_class = SurveyResponseSerializer
-    permission_classes = [IsAuthenticated]
+#             return Response({"message": "Survey response submitted successfully!"}, status=status.HTTP_201_CREATED)
+#         return Response(response_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class SurveyResponseDetailView(generics.RetrieveUpdateAPIView):
+#     queryset = SurveyResponse.objects.all()
+#     serializer_class = SurveyResponseSerializer
+#     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        """
-        Récupère une instance spécifique de SurveyResponse pour l'utilisateur.
-        """
-        user = self.request.user
-        response_id = self.kwargs.get("pk")  # Récupère l'ID de la réponse
-        try:
-            response = SurveyResponse.objects.get(id=response_id, created_by=user)
-        except SurveyResponse.DoesNotExist:
-            raise NotFound({"error": "Response not found or you do not have access"})
-        return response
+#     def get_object(self):
+#         """
+#         Récupère une instance spécifique de SurveyResponse pour l'utilisateur.
+#         """
+#         user = self.request.user
+#         response_id = self.kwargs.get("pk")  # Récupère l'ID de la réponse
+#         try:
+#             response = SurveyResponse.objects.get(id=response_id, created_by=user)
+#         except SurveyResponse.DoesNotExist:
+#             raise NotFound({"error": "Response not found or you do not have access"})
+#         return response
 
-class UserSurveyResponsesView(APIView):
-    permission_classes = [IsAuthenticated]
+# class UserSurveyResponsesView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        # Récupérer toutes les réponses de l'utilisateur connecté
-        user = request.user
-        responses = SurveyResponse.objects.filter(created_by=user)
+#     def get(self, request):
+#         # Récupérer toutes les réponses de l'utilisateur connecté
+#         user = request.user
+#         responses = SurveyResponse.objects.filter(created_by=user)
 
-        # Sérialiser les réponses
-        serializer = SurveyResponseSerializer(responses, many=True)
-        return Response(serializer.data)
+#         # Sérialiser les réponses
+#         serializer = SurveyResponseSerializer(responses, many=True)
+#         return Response(serializer.data)
     
-class CreateSurveyView(APIView):
-    permission_classes = [IsAuthenticated]
+# class CreateSurveyView(APIView):
+#     permission_classes = [IsAuthenticated]
     
-    def post(self, request):
-        """
-        Create a new survey with questions and choices.
-        """
-        data = request.data
-        user = request.user
-        print('user', user.id) 
+#     def post(self, request):
+#         """
+#         Create a new survey with questions and choices.
+#         """
+#         data = request.data
+#         user = request.user
+#         print('user', user.id) 
 
-        # Validate survey data
-        survey_serializer = SurveySerializer(data={
-            "title": data.get("title"),
-            "description": data.get("description"),
-        })
+#         # Validate survey data
+#         survey_serializer = SurveySerializer(data={
+#             "title": data.get("title"),
+#             "description": data.get("description"),
+#         })
 
-        if survey_serializer.is_valid():
-            # Save the survey and associate it with the user
-            survey = self.perform_create(survey_serializer, user)
+#         if survey_serializer.is_valid():
+#             # Save the survey and associate it with the user
+#             survey = self.perform_create(survey_serializer, user)
 
-            # Save each question
-            for question_data in data.get("questions", []):
-                question = Question.objects.create(
-                    survey=survey,
-                    text=question_data.get("text"),
-                    question_type=question_data.get("question_type"),
-                    required=question_data.get("required", True),
-                )
+#             # Save each question
+#             for question_data in data.get("questions", []):
+#                 question = Question.objects.create(
+#                     survey=survey,
+#                     text=question_data.get("text"),
+#                     question_type=question_data.get("question_type"),
+#                     required=question_data.get("required", True),
+#                 )
 
-                # Save choices for the question (if applicable)
-                for choice_text in question_data.get("choices", []):
-                    Choice.objects.create(question=question, text=choice_text)
+#                 # Save choices for the question (if applicable)
+#                 for choice_text in question_data.get("choices", []):
+#                     Choice.objects.create(question=question, text=choice_text)
 
-            return Response(
-                {"message": "Survey created successfully!", "survey_id": survey.id},
-                status=status.HTTP_201_CREATED,
-            )
+#             return Response(
+#                 {"message": "Survey created successfully!", "survey_id": survey.id},
+#                 status=status.HTTP_201_CREATED,
+#             )
 
-        return Response(survey_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         return Response(survey_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def perform_create(self, serializer, user):
-        """
-        Custom save method to associate the user with the survey.
-        """
-        # Add the user to the survey before saving
-        survey = serializer.save(created_by=user)  # Associate the user
-        return survey
+#     def perform_create(self, serializer, user):
+#         """
+#         Custom save method to associate the user with the survey.
+#         """
+#         # Add the user to the survey before saving
+#         survey = serializer.save(created_by=user)  # Associate the user
+#         return survey
 
-    def get_queryset(self):
-        user = self.request.user
-        return Survey.objects.filter(created_by=user)
+#     def get_queryset(self):
+#         user = self.request.user
+#         return Survey.objects.filter(created_by=user)
 
 class CanteenListView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CanteenSerializer
-    print('canteen')
+    # print('canteen')
     def get_queryset(self):
         """
         Retourne les cantines où l'utilisateur est admin ou consommateur.
@@ -376,51 +401,52 @@ class CanteenDetailView(APIView):
         serializer = CanteenSerializer(canteen)
         return Response(serializer.data)
     
-class SurveyCanteenListView(ListAPIView):
-    serializer_class = SurveyCanteenSerializer
-    permission_classes = [IsAuthenticated]
+# class SurveyCanteenListView(ListAPIView):
+#     serializer_class = SurveyCanteenSerializer
+#     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        """
-        Retrieve all survey-canteen mappings for the authenticated user's cantines.
-        """
-        user_cantines = self.request.user.admin_cantines.all()  # Cantines managed by this user
-        return SurveyCanteen.objects.filter(canteen__in=user_cantines)
+#     def get_queryset(self):
+#         """
+#         Retrieve all survey-canteen mappings for the authenticated user's cantines.
+#         """
+#         user_cantines = self.request.user.admin_cantines.all()  # Cantines managed by this user
+#         return SurveyCanteen.objects.filter(canteen__in=user_cantines)
     
-class SurveyCanteensView(APIView):
-    """
-    Retourne toutes les cantines associées à un survey spécifique.
-    """
-    def get(self, request, survey_id):
-        try:
-            survey = Survey.objects.get(id=survey_id)
-        except Survey.DoesNotExist:
-            return Response({"error": "Survey not found"}, status=status.HTTP_404_NOT_FOUND)
+# class SurveyCanteensView(APIView):
+#     """
+#     Retourne toutes les cantines associées à un survey spécifique.
+#     """
+#     def get(self, request, survey_id):
+#         print('suvey_id', survey_id)
+#         try:
+#             survey = Survey.objects.get(id=survey_id)
+#         except Survey.DoesNotExist:
+#             return Response({"error": "Survey not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        # Récupérer les cantines associées à ce survey via la table intermédiaire SurveyCanteen
-        survey_canteens = SurveyCanteen.objects.filter(survey=survey)
-        canteens = [survey_canteen.canteen for survey_canteen in survey_canteens]
+#         # Récupérer les cantines associées à ce survey via la table intermédiaire SurveyCanteen
+#         survey_canteens = SurveyCanteen.objects.filter(survey=survey)
+#         canteens = [survey_canteen.canteen for survey_canteen in survey_canteens]
         
-        # Sérialiser les cantines
-        serializer = CanteenSerializer(canteens, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+#         # Sérialiser les cantines
+#         serializer = CanteenSerializer(canteens, many=True)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class CreateSurveyCanteenView(generics.CreateAPIView):
-    serializer_class = SurveyCanteenSerializer
-    permission_classes = [IsAuthenticated]
+# class CreateSurveyCanteenView(generics.CreateAPIView):
+#     serializer_class = SurveyCanteenSerializer
+#     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        """
-        Check if the user has permission to link the survey to the canteen.
-        """
-        canteen = serializer.validated_data['canteen']
-        survey = serializer.validated_data['survey']
+#     def perform_create(self, serializer):
+#         """
+#         Check if the user has permission to link the survey to the canteen.
+#         """
+#         canteen = serializer.validated_data['canteen']
+#         survey = serializer.validated_data['survey']
 
-        # Ensure the user is an admin of the canteen
-        if not canteen.admins.filter(id=self.request.user.id).exists():
-            raise serializer.ValidationError("You do not have permission to link a survey to this canteen.")
+#         # Ensure the user is an admin of the canteen
+#         if not canteen.admins.filter(id=self.request.user.id).exists():
+#             raise serializer.ValidationError("You do not have permission to link a survey to this canteen.")
 
-        # Save the SurveyCanteen object
-        return serializer.save()
+#         # Save the SurveyCanteen object
+#         return serializer.save()
 
 # Create your views here.

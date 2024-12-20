@@ -25,5 +25,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('playground/', include('playground.urls')),
     path('api/', include('api.urls')),
-    path('surveys_/', include('djf_surveys.urls'))
+    path('surveys/', include('djf_surveys.urls'))
 ] + debug_toolbar_urls() + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
